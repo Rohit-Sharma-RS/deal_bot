@@ -1,5 +1,5 @@
 """
-swiggy_scraper.py — Scrapes restaurant deals from Swiggy for Kolkata (Salt Lake).
+swiggy_scraper.py — Scrapes restaurant deals from Swiggy for a configured location.
 
 Strategy:
   1. Hit Swiggy's internal restaurant listing API (used by their web app).
@@ -15,7 +15,7 @@ import re
 from typing import List, Dict
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from config.config import SWIGGY_LAT, SWIGGY_LON, MIN_DISCOUNT_PERCENT
+from config.config import SWIGGY_LAT, SWIGGY_LON, MIN_DISCOUNT_PERCENT, USER_CITY, USER_LOCALITY
 from scraper.base_scraper import fetch_json, random_headers, parse_discount_from_text, classify_offer_type
 
 logger = logging.getLogger(__name__)
@@ -160,7 +160,7 @@ def scrape_swiggy(max_pages: int = 3) -> List[Dict]:
     Returns list of normalised deal dicts.
     """
     all_deals: List[Dict] = []
-    logger.info("🟠 Starting Swiggy scrape for Salt Lake / Kolkata...")
+    logger.info("🟠 Starting Swiggy scrape for %s / %s...", USER_LOCALITY, USER_CITY)
 
     for page in range(max_pages):
         offset = page * 15

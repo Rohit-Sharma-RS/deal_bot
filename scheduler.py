@@ -59,7 +59,7 @@ def main():
         scheduled_job,
         trigger=CronTrigger(hour=NOTIFY_HOUR, minute=NOTIFY_MINUTE, timezone="Asia/Kolkata"),
         id="daily_deals",
-        name="Daily Kolkata Restaurant Deals",
+        name="Daily Restaurant Deals",
         max_instances=1,
         misfire_grace_time=300,  # Allow 5 min late
     )

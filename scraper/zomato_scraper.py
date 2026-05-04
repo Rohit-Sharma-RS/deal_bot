@@ -1,5 +1,5 @@
 """
-zomato_scraper.py — Scrapes restaurant deals from Zomato (Kolkata).
+zomato_scraper.py — Scrapes restaurant deals from Zomato for a configured city.
 
 Strategy (in priority order):
   1. HTTP + session cookies (httpx) — fastest, works when Zomato session is valid.
@@ -14,7 +14,7 @@ HTML selectors (verified from live zomato_page_html):
   - Rating                : .sc-1q7bklc-1.cILgox  (or .sc-1q7bklc-1)
   - Cuisine               : p.sc-gggouf (first one without ₹)
   - Area                  : p.sc-cyQzhP
-  - URL                   : href on nearest a[href^='/kolkata/']
+  - URL                   : href on nearest a[href^='/<city-slug>/']
 """
 
 import logging
@@ -28,15 +28,15 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from config.config import (
     USER_LAT, USER_LON, MIN_DISCOUNT_PERCENT,
     ZOMATO_CITY_ID, ZOMATO_COOKIES, REQUEST_DELAY_SECONDS,
-    SEARCH_RADIUS_KM
+    SEARCH_RADIUS_KM, USER_CITY, USER_CITY_SLUG
 )
 from scraper.base_scraper import parse_discount_from_text, classify_offer_type
 
 logger = logging.getLogger(__name__)
 
 # ─── URLs ─────────────────────────────────────────────────────────────────────
-ZOMATO_DINEOUT_URL  = "https://www.zomato.com/kolkata/dine-out?dining_payment_enabled_flag=true"
-ZOMATO_DELIVERY_URL = "https://www.zomato.com/kolkata/order-food-online"
+ZOMATO_DINEOUT_URL  = f"https://www.zomato.com/{USER_CITY_SLUG}/dine-out?dining_payment_enabled_flag=true"
+ZOMATO_DELIVERY_URL = f"https://www.zomato.com/{USER_CITY_SLUG}/order-food-online"
 
 
 # ─── Haversine distance ────────────────────────────────────────────────────────
@@ -120,7 +120,7 @@ def _parse_cards_from_soup(soup) -> List[Dict]:
     """
     Parse restaurant cards from a BeautifulSoup object.
     Works on both dine-out and delivery page HTML.
-    Only returns restaurants from the Kolkata area.
+    Only returns restaurants from the configured city area.
     """
     deals = []
     cards = soup.select("div.jumbo-tracker")
@@ -133,7 +133,7 @@ def _parse_cards_from_soup(soup) -> List[Dict]:
             name = name_tag.get_text(strip=True) if name_tag else "Unknown"
 
             # URL
-            link_tag = card.select_one("a[href^='/kolkata/']")
+            link_tag = card.select_one(f"a[href^='/{USER_CITY_SLUG}/']")
             rest_url = ("https://www.zomato.com" + link_tag["href"]) if link_tag else ""
 
             # Rating
@@ -156,13 +156,13 @@ def _parse_cards_from_soup(soup) -> List[Dict]:
                 elif "₹" not in txt and txt:
                     cuisine = ", ".join(txt.split(",")[:3]).strip()
 
-            # Area — must contain "Kolkata" to be valid
+            # Area — must contain the city name to be valid
             area_tag = card.select_one("p.sc-cyQzhP") or card.select_one(".min-basic-info-left p")
             area = area_tag.get_text(strip=True).strip(" ,") if area_tag else ""
 
-            # ── Kolkata-only filter ─────────────────────────────────
-            if area and "kolkata" not in area.lower():
-                logger.debug("Skipping non-Kolkata restaurant: %s (%s)", name, area)
+            # ── City-only filter ─────────────────────────────────
+            if area and USER_CITY_SLUG not in area.lower() and USER_CITY.lower() not in area.lower():
+                logger.debug("Skipping non-%s restaurant: %s (%s)", USER_CITY, name, area)
                 continue
 
             # ── Distance filter (7 km radius) ──────────────────────
@@ -348,7 +348,7 @@ def scrape_zomato() -> List[Dict]:
     Returns list of normalised deal dicts.
     """
     all_deals: List[Dict] = []
-    logger.info("Starting Zomato scrape for Kolkata...")
+    logger.info("Starting Zomato scrape for %s...", USER_CITY)
 
     for url in [ZOMATO_DINEOUT_URL, ZOMATO_DELIVERY_URL]:
         logger.info("--- Scraping: %s", url)

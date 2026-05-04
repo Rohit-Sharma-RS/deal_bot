@@ -9,7 +9,7 @@ from typing import List, Dict
 from datetime import date
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from config.config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, USER_LOCALITY
+from config.config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, USER_LOCALITY, USER_CITY
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +85,7 @@ def _format_deal_message(deals: List[Dict]) -> str:
     footer = (
         f"\n\n{'─'*34}\n"
         f"💡 <i>Deals scraped from Zomato &amp; Swiggy</i>\n"
-        f"🤖 <i>KolkataDealBot — Salt Lake Edition</i>"
+        f"🤖 <i>DealBot — {USER_CITY} Edition</i>"
     )
 
     return header + body + footer
@@ -161,8 +161,8 @@ def send_deals(deals: List[Dict]) -> bool:
 def send_startup_message() -> bool:
     """Send a test/startup confirmation message."""
     msg = (
-        "✅ <b>KolkataDealBot is now active!</b>\n\n"
-        f"📍 Area: <b>{USER_LOCALITY}</b>\n"
+        "✅ <b>DealBot is now active!</b>\n\n"
+        f"📍 Area: <b>{USER_LOCALITY}, {USER_CITY}</b>\n"
         "🟠 Swiggy + 🔴 Zomato deals tracked\n"
         "🕕 Daily notification at 6:00 PM\n\n"
         "<i>You'll receive the top discount deals every evening. "

@@ -72,7 +72,7 @@ def cmd_stats():
 
 
 def cmd_top():
-    from config.config import TOP_DEALS_COUNT, MIN_DISCOUNT_PERCENT
+    from config.config import TOP_DEALS_COUNT, MIN_DISCOUNT_PERCENT, USER_LOCALITY, USER_CITY
     from db.database import get_top_deals_today
 
     deals = get_top_deals_today(limit=TOP_DEALS_COUNT, min_discount=MIN_DISCOUNT_PERCENT)
@@ -80,7 +80,7 @@ def cmd_top():
         console.print("[red]No deals found for today. Run 'scrape' first.[/]")
         return
 
-    table = Table(title=f"Today's Top {len(deals)} Deals — Salt Lake, Kolkata")
+    table = Table(title=f"Today's Top {len(deals)} Deals — {USER_LOCALITY}, {USER_CITY}")
     table.add_column("#",        style="cyan",    width=4)
     table.add_column("Disc%",    style="bold red", width=6)
     table.add_column("Platform", style="yellow",  width=8)
@@ -114,7 +114,7 @@ def cmd_test_bot():
 def cmd_setup():
     """Interactive setup wizard."""
     console.print("\n[bold cyan]╔══════════════════════════════════╗[/]")
-    console.print("[bold cyan]║   KolkataDealBot Setup Wizard    ║[/]")
+    console.print("[bold cyan]║      DealBot Setup Wizard        ║[/]")
     console.print("[bold cyan]╚══════════════════════════════════╝[/]\n")
 
     console.print("[bold]Step 1: Create your Telegram bot[/]")
@@ -154,7 +154,7 @@ COMMANDS = {
 
 if __name__ == "__main__":
     if len(sys.argv) < 2 or sys.argv[1] not in COMMANDS:
-        console.print("\n[bold]KolkataDealBot CLI[/]")
+        console.print("\n[bold]DealBot CLI[/]")
         console.print("Usage: [cyan]python cli.py <command>[/]\n")
         console.print("Commands:")
         console.print("  [green]run[/]       — Full pipeline (scrape + store + notify)")

@@ -1,1 +1,34 @@
-*.env
+# Environments
+.env
+secrets.env
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+logs/
+*.log
+
+# Databases
+db/*.db
+db/*.sqlite3
+
+# Playwright / Browsers
+.playwright/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

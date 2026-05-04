@@ -36,7 +36,7 @@ def run_pipeline(notify: bool = True) -> dict:
     }
 
     logger.info("=" * 55)
-    logger.info("🚀 Starting Kolkata Deals Pipeline")
+    logger.info("🚀 Starting Deals Pipeline")
     logger.info("=" * 55)
 
     # ── Step 1: Scrape ────────────────────────────────────────

@@ -1,1 +1,1 @@
-# KolkataDealBot
+# DealBot

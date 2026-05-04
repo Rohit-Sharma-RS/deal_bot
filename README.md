@@ -1,6 +1,6 @@
 # 🍽️ KolkataDealBot — Restaurant Deal Tracker
 
-Automatically scrapes **Zomato** and **Swiggy** for the best restaurant deals in **Salt Lake / Sector V, Kolkata**, ranks them by discount %, stores them daily, and sends a **Telegram notification at 6 PM IST** every day.
+Automatically scrapes **Zomato** and **Swiggy** for the best restaurant deals **in your given location**, ranks them by discount %, stores them daily, and sends a **Telegram notification at your specified time** every day.
 
 ---
 
@@ -8,8 +8,7 @@ Automatically scrapes **Zomato** and **Swiggy** for the best restaurant deals in
 
 ```
 kolkata_deals/
-├── .env.example          ← Copy to .env and fill in your tokens
-├── .env                  ← Your secrets (never commit this!)
+├── .env
 ├── requirements.txt
 ├── pipeline.py           ← Main orchestration (scrape → rank → store → notify)
 ├── scheduler.py          ← APScheduler daemon (run this to start the bot)
@@ -89,7 +88,7 @@ python cli.py run
 python scheduler.py
 ```
 
-Deals will now arrive every day at **6:00 PM IST** automatically. 🎉
+Deals will arrive every day at **your specified time** automatically. 🎉
 
 ---
 
@@ -124,15 +123,15 @@ kill $(cat scheduler.pid)
 
 ### Option B — systemd service (recommended for servers/Raspberry Pi)
 
-Create `/etc/systemd/system/kolkata-deals.service`:
+Create `/etc/systemd/system/deals-bot.service`:
 
 ```ini
 [Unit]
-Description=KolkataDealBot
+Description=DealBot
 After=network.target
 
 [Service]
-WorkingDirectory=/path/to/kolkata_deals
+WorkingDirectory=/path/to/deals-bot
 ExecStart=/usr/bin/python3 scheduler.py
 Restart=always
 User=your_username
@@ -142,9 +141,9 @@ WantedBy=multi-user.target
 ```
 
 ```bash
-sudo systemctl enable kolkata-deals
-sudo systemctl start kolkata-deals
-sudo systemctl status kolkata-deals
+sudo systemctl enable deals-bot
+sudo systemctl start deals-bot
+sudo systemctl status deals-bot
 ```
 
 ### Option C — Windows Task Scheduler or macOS launchd
