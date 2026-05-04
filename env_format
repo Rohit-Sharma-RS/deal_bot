@@ -17,7 +17,8 @@ NOTIFY_HOUR=18       # 6 PM in 24h format
 NOTIFY_MINUTE=0
 
 # ─── Scraper Settings ───────────────────────────────────────
-TOP_DEALS_COUNT=15          # How many deals to send daily
+TOP_DEALS_ZOMATO=15         # How many Zomato deals to send daily
+TOP_DEALS_SWIGGY=15         # How many Swiggy deals to send daily
 MIN_DISCOUNT_PERCENT=10     # Ignore deals below this %
 REQUEST_DELAY_SECONDS=4     # Be polite to servers
 

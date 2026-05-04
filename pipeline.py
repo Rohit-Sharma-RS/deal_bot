@@ -7,7 +7,7 @@ import logging
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from config.config import TOP_DEALS_COUNT, MIN_DISCOUNT_PERCENT
+from config.config import TOP_DEALS_ZOMATO, TOP_DEALS_SWIGGY, MIN_DISCOUNT_PERCENT
 from db.database import init_db, upsert_deals, get_top_deals_today, mark_notified, log_notification
 from scraper.swiggy_scraper import scrape_swiggy
 from scraper.zomato_scraper import scrape_zomato
@@ -76,15 +76,20 @@ def run_pipeline(notify: bool = True) -> dict:
     logger.info("💾 Stored %d new deals in database", stored)
 
     # ── Step 4: Notify ────────────────────────────────────────
-    top_today = get_top_deals_today(limit=TOP_DEALS_COUNT, min_discount=MIN_DISCOUNT_PERCENT)
-    result["top_deals"] = len(top_today)
+    logger.info("=" * 55)
+    top_deals = get_top_deals_today(
+        limit_zomato=TOP_DEALS_ZOMATO, 
+        limit_swiggy=TOP_DEALS_SWIGGY, 
+        min_discount=MIN_DISCOUNT_PERCENT
+    )
+    result["top_deals"] = len(top_deals)
 
-    if notify and top_today:
-        success = send_deals(top_today)
+    if notify and top_deals:
+        success = send_deals(top_deals)
         result["notified"] = success
         if success:
-            mark_notified([d["id"] for d in top_today])
-            log_notification(len(top_today), f"Sent {len(top_today)} deals")
+            mark_notified([d["id"] for d in top_deals])
+            log_notification(len(top_deals), f"Sent {len(top_deals)} deals")
     elif not notify:
         logger.info("Notification skipped (notify=False)")
 

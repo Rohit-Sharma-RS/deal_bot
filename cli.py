@@ -52,10 +52,14 @@ def cmd_scrape():
 
 
 def cmd_notify():
-    from config.config import TOP_DEALS_COUNT, MIN_DISCOUNT_PERCENT
+    from config.config import TOP_DEALS_ZOMATO, TOP_DEALS_SWIGGY, MIN_DISCOUNT_PERCENT
     from db.database import get_top_deals_today
     from notifier.telegram_notifier import send_deals
-    deals = get_top_deals_today(limit=TOP_DEALS_COUNT, min_discount=MIN_DISCOUNT_PERCENT)
+    deals = get_top_deals_today(
+        limit_zomato=TOP_DEALS_ZOMATO, 
+        limit_swiggy=TOP_DEALS_SWIGGY, 
+        min_discount=MIN_DISCOUNT_PERCENT
+    )
     if not deals:
         console.print("[red]No deals found for today. Run 'scrape' first.[/]")
         return
@@ -72,10 +76,14 @@ def cmd_stats():
 
 
 def cmd_top():
-    from config.config import TOP_DEALS_COUNT, MIN_DISCOUNT_PERCENT, USER_LOCALITY, USER_CITY
+    from config.config import TOP_DEALS_ZOMATO, TOP_DEALS_SWIGGY, MIN_DISCOUNT_PERCENT, USER_LOCALITY, USER_CITY
     from db.database import get_top_deals_today
 
-    deals = get_top_deals_today(limit=TOP_DEALS_COUNT, min_discount=MIN_DISCOUNT_PERCENT)
+    deals = get_top_deals_today(
+        limit_zomato=TOP_DEALS_ZOMATO, 
+        limit_swiggy=TOP_DEALS_SWIGGY, 
+        min_discount=MIN_DISCOUNT_PERCENT
+    )
     if not deals:
         console.print("[red]No deals found for today. Run 'scrape' first.[/]")
         return

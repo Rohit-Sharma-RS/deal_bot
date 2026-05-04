@@ -33,7 +33,8 @@ NOTIFY_HOUR: int   = int(os.getenv("NOTIFY_HOUR", "18"))
 NOTIFY_MINUTE: int = int(os.getenv("NOTIFY_MINUTE", "0"))
 
 # ── Scraper ───────────────────────────────────────────────────────────────────
-TOP_DEALS_COUNT: int         = int(os.getenv("TOP_DEALS_COUNT", "10"))
+TOP_DEALS_ZOMATO: int        = int(os.getenv("TOP_DEALS_ZOMATO", "15"))
+TOP_DEALS_SWIGGY: int        = int(os.getenv("TOP_DEALS_SWIGGY", "15"))
 MIN_DISCOUNT_PERCENT: int    = int(os.getenv("MIN_DISCOUNT_PERCENT", "10"))
 REQUEST_DELAY_SECONDS: float = float(os.getenv("REQUEST_DELAY_SECONDS", "2"))
 

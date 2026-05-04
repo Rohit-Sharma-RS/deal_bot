@@ -121,20 +121,35 @@ def upsert_deals(deals: List[Dict]) -> int:
     return inserted
 
 
-def get_top_deals_today(limit: int = 10, min_discount: int = 10) -> List[Dict]:
+def get_top_deals_today(limit_zomato: int = 15, limit_swiggy: int = 15, min_discount: int = 10) -> List[Dict]:
     """
-    Fetch today's top deals ranked by discount_pct DESC.
+    Fetch today's top deals for Zomato and Swiggy according to their respective limits,
+    then combine and return them sorted by discount_pct DESC.
     """
     today = date.today().isoformat()
     with get_connection() as conn:
-        rows = conn.execute("""
+        zomato_rows = conn.execute("""
             SELECT * FROM deals
             WHERE scraped_date = ?
+              AND platform = 'zomato'
               AND discount_pct >= ?
             ORDER BY discount_pct DESC, rating DESC
             LIMIT ?
-        """, (today, min_discount, limit)).fetchall()
-    return [dict(r) for r in rows]
+        """, (today, min_discount, limit_zomato)).fetchall()
+
+        swiggy_rows = conn.execute("""
+            SELECT * FROM deals
+            WHERE scraped_date = ?
+              AND platform = 'swiggy'
+              AND discount_pct >= ?
+            ORDER BY discount_pct DESC, rating DESC
+            LIMIT ?
+        """, (today, min_discount, limit_swiggy)).fetchall()
+
+    combined = [dict(r) for r in zomato_rows] + [dict(r) for r in swiggy_rows]
+    # Sort the combined list so the final output is ordered by discount
+    combined.sort(key=lambda x: (x['discount_pct'], x['rating']), reverse=True)
+    return combined
 
 
 def mark_notified(deal_ids: List[int]):
