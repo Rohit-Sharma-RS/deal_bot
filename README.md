@@ -1,37 +1,65 @@
-# 🍽️ KolkataDealBot — Restaurant Deal Tracker
+# 🍽️ DealBot — Restaurant Deal Tracker (Any City)
 
-Automatically scrapes **Zomato** and **Swiggy** for the best restaurant deals **in your given location**, ranks them by discount %, stores them daily, and sends a **Telegram notification at your specified time** every day.
+Automatically scrapes **Zomato and Swiggy** for the best restaurant deals **in any city**, ranks them by discount %, stores them daily, and sends a **Telegram notification at your specified time through the day!**.
+
+---
+
+## 🌍 Now Supports Any City
+
+You can configure it for **any city** by updating:
+
+```env
+USER_CITY=Kolkata
+USER_CITY_SLUG=kolkata
+```
+
+### 🧠 What these mean:
+
+* `USER_CITY` → Display name (used in messages/logs)
+* `USER_CITY_SLUG` → Used in URLs (must match platform format)
+
+---
+
+### 📍 Examples
+
+| City      | USER_CITY | USER_CITY_SLUG |
+| --------- | --------- | -------------- |
+| Kolkata   | Kolkata   | kolkata        |
+| Bangalore | Bangalore | bangalore      |
+| Delhi     | Delhi     | ncr            |
+| Mumbai    | Mumbai    | mumbai         |
+| Hyderabad | Hyderabad | hyderabad      |
 
 ---
 
 ## 📁 Project Structure
 
 ```
-kolkata_deals/
+dealbot/
 ├── .env
 ├── requirements.txt
 ├── pipeline.py           ← Main orchestration (scrape → rank → store → notify)
-├── scheduler.py          ← APScheduler daemon (run this to start the bot)
-├── cli.py                ← Command-line tool for manual control
+├── scheduler.py          ← APScheduler daemon
+├── cli.py                ← Command-line tool
 │
 ├── config/
-│   └── config.py         ← All settings loaded from .env
+│   └── config.py         ← Loads settings from .env
 │
 ├── scraper/
-│   ├── base_scraper.py   ← HTTP utilities, retry logic, offer parsers
-│   ├── swiggy_scraper.py ← Swiggy deal scraper
-│   ├── zomato_scraper.py ← Zomato deal scraper
-│   └── ranker.py         ← Scoring + deduplication engine
+│   ├── base_scraper.py
+│   ├── swiggy_scraper.py
+│   ├── zomato_scraper.py
+│   └── ranker.py         ← Scoring + deduplication
 │
 ├── db/
-│   ├── database.py       ← SQLite storage layer
-│   └── deals.db          ← Auto-created on first run
+│   ├── database.py
+│   └── deals.db
 │
 ├── notifier/
-│   └── telegram_notifier.py  ← Telegram Bot sender
+│   └── telegram_notifier.py
 │
 └── logs/
-    └── app.log           ← Auto-created on first run
+    └── app.log
 ```
 
 ---
@@ -44,101 +72,133 @@ kolkata_deals/
 pip install -r requirements.txt
 ```
 
-### Step 2 — Create a Telegram Bot
+---
 
-1. Open Telegram → search **@BotFather** → send `/newbot`
-2. Follow the prompts, give your bot a name like `KolkataDealBot`
-3. Copy the **API token** it gives you (looks like `7123456789:AAFxxx...`)
+### Step 2 — Create Telegram Bot
 
-### Step 3 — Get your Telegram Chat ID
+1. Open Telegram
+2. Search **@BotFather** → `/newbot`
+3. Copy API token
 
-1. Open Telegram → search **@userinfobot** → send `/start`
-2. It replies with your **Chat ID** (a number like `987654321`)
+---
 
-### Step 4 — Configure .env
+### Step 3 — Get Chat ID
+
+1. Search **@userinfobot**
+2. Send `/start`
+3. Copy your Chat ID
+
+---
+
+### Step 4 — Configure `.env`
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env`:
+Edit:
 
 ```env
-TELEGRAM_BOT_TOKEN=7123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-TELEGRAM_CHAT_ID=987654321
+TELEGRAM_BOT_TOKEN=your_token
+TELEGRAM_CHAT_ID=your_chat_id
+
+USER_CITY=Kolkata
+USER_CITY_SLUG=kolkata
+USER_LAT=22.5804
+USER_LON=88.4183
 ```
 
-### Step 5 — Test the bot
+---
+
+### Step 5 — Test bot
 
 ```bash
 python cli.py test-bot
 ```
 
-You should receive a welcome message in Telegram. ✅
+---
 
-### Step 6 — Run once manually
+### Step 6 — Run manually
 
 ```bash
 python cli.py run
 ```
 
-### Step 7 — Start the daily scheduler
+---
+
+### Step 7 — Start scheduler
 
 ```bash
 python scheduler.py
 ```
 
-Deals will arrive every day at **your specified time** automatically. 🎉
-
 ---
 
 ## 🛠️ CLI Commands
 
-| Command                  | Description                            |
-| ------------------------ | -------------------------------------- |
-| `python cli.py run`      | Full pipeline: scrape + store + notify |
-| `python cli.py scrape`   | Scrape only, no Telegram message       |
-| `python cli.py notify`   | Send today's stored deals to Telegram  |
-| `python cli.py top`      | Print today's top deals in terminal    |
-| `python cli.py stats`    | Show database statistics               |
-| `python cli.py test-bot` | Send a test Telegram message           |
-| `python cli.py setup`    | Interactive setup wizard               |
+| Command                  | Description    |
+| ------------------------ | -------------- |
+| `python cli.py run`      | Full pipeline  |
+| `python cli.py scrape`   | Scrape only    |
+| `python cli.py notify`   | Send deals     |
+| `python cli.py top`      | Show top deals |
+| `python cli.py stats`    | DB stats       |
+| `python cli.py test-bot` | Test Telegram  |
+| `python cli.py setup`    | Setup wizard   |
 
 ---
 
-## ⚙️ Configuration Options (.env)
+## ⚙️ Configuration Options
 
-| Variable                | Default            | Description                     |
-| ----------------------- | ------------------ | ------------------------------- |
-| `TELEGRAM_BOT_TOKEN`    | —                  | Required. From @BotFather       |
-| `TELEGRAM_CHAT_ID`      | —                  | Required. From @userinfobot     |
-| `USER_LOCALITY`         | Salt Lake Sector V | Your area name (display only)   |
-| `USER_LAT`              | 22.5804            | Your latitude (for Swiggy API)  |
-| `USER_LON`              | 88.4183            | Your longitude (for Swiggy API) |
-| `NOTIFY_HOUR`           | 18                 | Notification hour (24h, IST)    |
-| `NOTIFY_MINUTE`         | 0                  | Notification minute             |
-| `TOP_DEALS_COUNT`       | 10                 | Number of deals in notification |
-| `MIN_DISCOUNT_PERCENT`  | 10                 | Ignore deals below this %       |
-| `REQUEST_DELAY_SECONDS` | 2                  | Delay between HTTP requests     |
+| Variable                | Description             |
+| ----------------------- | ----------------------- |
+| `USER_CITY`             | Display city name       |
+| `USER_CITY_SLUG`        | Used in URLs            |
+| `USER_LAT` / `USER_LON` | Required for Swiggy API |
+| `NOTIFY_HOUR`           | Daily notification hour |
+| `TOP_DEALS_COUNT`       | Number of deals sent    |
 
 ---
 
-## 🗄️ Database Schema
+## 🧠 How It Works
 
-Deals are stored in SQLite (`db/deals.db`):
+```
+Scraper → Ranker → Database → Telegram Notifier
+```
 
-- `platform` — zomato / swiggy
-- `restaurant_name`, `location`, `area`, `cuisine`, `rating`
-- `discount_pct`, `offer_type`, `offer_title`
-- `min_order`, `max_discount`, `restaurant_url`
-- `scraped_date`, `scraped_at`, `is_notified`
+* Scrapes deals from multiple platforms
+* Normalizes + deduplicates data
+* Ranks based on discount & relevance
+* Stores historical data
+* Sends daily alerts
 
-Historical data accumulates over time — great for trend analysis!
+---
+
+## 📊 Database
+
+SQLite (`db/deals.db`) stores:
+
+* restaurant_name
+* platform (zomato/swiggy)
+* discount_pct
+* offer_title
+* rating
+* location
+* timestamp
 
 ---
 
 ## ⚠️ Notes
 
-- Zomato and Swiggy occasionally change their internal API structures. If scraping breaks, the HTML fallback parser activates automatically.
-- This tool is for personal use only. Use responsibly and respect the platforms' terms of service.
-- Running on a Raspberry Pi or cheap VPS keeps it running 24/7 without leaving your PC on.
+* APIs may change → fallback parsing is used
+* Cookies/session may be required for some endpoints
+* Intended for personal use
+
+---
+
+## 🚀 Future Improvements
+
+* Multi-city tracking in one run
+* Web dashboard
+* ML-based deal prediction
+* Cloud deployment (24/7 bot)
